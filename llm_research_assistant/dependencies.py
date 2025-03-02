@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from llm_research_assistant.jwt import decode_access_token
-from llm_research_assistant.db import users_collection
+from llm_research_assistant.db import users_collection, db
 from bson import ObjectId
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -31,3 +31,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
 
     return user_doc
+
+
+async def get_db():
+    """Provide a database connection for FastAPI dependencies."""
+    return db
