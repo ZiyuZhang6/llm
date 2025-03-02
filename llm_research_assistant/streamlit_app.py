@@ -1,5 +1,13 @@
 import streamlit as st
 import requests
+import subprocess
+import time
+import os
+
+
+fastapi_process = subprocess.Popen(["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
+time.sleep(5)  
+
 
 API_BASE_URL = "http://localhost:8000"  # Adjust if needed
 
