@@ -3,9 +3,9 @@ from fastapi import APIRouter, HTTPException, status, Query, Depends
 from typing import List
 from bson import ObjectId
 from llm_research_assistant.db import users_collection
-from schemas.users import UserCreate, UserUpdate, UserResponse
-from security import hash_password
-from dependencies import get_current_user
+from llm_research_assistant.schemas.users import UserCreate, UserUpdate, UserResponse
+from llm_research_assistant.security import hash_password
+from llm_research_assistant.dependencies import get_current_user
 
 
 router = APIRouter(prefix="/users", tags=["users"])
