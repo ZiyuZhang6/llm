@@ -11,3 +11,4 @@ PyJWT
 pymupdf
 boto3
 pydantic[email]
+python-multipart
