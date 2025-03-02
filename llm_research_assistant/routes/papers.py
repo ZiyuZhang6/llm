@@ -7,15 +7,15 @@ from llm_research_assistant.services.s3_service import (
     get_pdf_url_from_s3,
     delete_pdf_from_s3,
 )
-from services.mongo_service import (
+from llm_research_assistant.services.mongo_service import (
     store_paper_metadata,
     get_paper_metadata,
     delete_paper_metadata,
 )
 
-from db import papers_collection
-from dependencies import get_current_user
-from schemas.papers import (
+from llm_research_assistant.db import papers_collection
+from llm_research_assistant.dependencies import get_current_user
+from llm_research_assistant.schemas.papers import (
     PaperUpdate,
     PaperResponse,
 )
