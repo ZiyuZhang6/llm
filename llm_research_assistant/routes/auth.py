@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
-from db import users_collection
-from security import verify_password
-from jwt import create_access_token
-from schemas.users import UserCreate
+from llm_research_assistant.db import users_collection
+from llm_research_assistant.security import verify_password
+from llm_research_assistant.jwt import create_access_token
+from llm_research_assistant.schemas.users import UserCreate
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
