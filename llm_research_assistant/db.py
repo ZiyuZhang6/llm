@@ -8,6 +8,7 @@ db = client[settings.MONGODB_DB_NAME]
 users_collection = db["users"]
 papers_collection = db["papers"]
 chats_collection = db["chats"]
+email_ingestion_collection = db["email_ingestion"]
 
 
 async def test_mongodb():
