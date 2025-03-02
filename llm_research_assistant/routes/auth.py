@@ -44,7 +44,7 @@ async def register_user(user_in: UserCreate):
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    from llm_research_assistant.security import hash_password
+    from security import hash_password
 
     hashed = hash_password(user_in.password)
     new_user_doc = {
