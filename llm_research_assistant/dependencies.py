@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from llm_research_assistant.jwt import decode_access_token
-from llm_research_assistant.db import users_collection
+from jwt import decode_access_token
+from db import users_collection
 from bson import ObjectId
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
