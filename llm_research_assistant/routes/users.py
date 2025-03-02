@@ -6,6 +6,7 @@ from llm_research_assistant.db import users_collection
 from llm_research_assistant.schemas.users import UserCreate, UserUpdate, UserResponse
 from llm_research_assistant.security import hash_password
 from llm_research_assistant.dependencies import get_current_user
+from llm_research_assistant.db import email_ingestion_collection
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -39,10 +40,21 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     """
     Return information about the currently authenticated user.
     """
+    # Fetch the user's connected email, if available
+    email = None
+    email_ingestion = await email_ingestion_collection.find_one(
+        {"user_id": current_user["_id"]}
+    )
+
+    if email_ingestion:
+        email = email_ingestion["connected_email"]
+        print(email)
+
     return UserResponse(
         id=str(current_user["_id"]),
         name=current_user["name"],
         email=current_user["email"],
+        connected_email=email,
     )
 
 
