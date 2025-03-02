@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_BASE_URL = "https://llm-as.streamlit.app/"  # Adjust if needed
+API_BASE_URL = "http://localhost:8000"  # Adjust if needed
 
 
 def do_login(email, password):
