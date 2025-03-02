@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+motor
+pymongo
+pydantic
+requests
+streamlit
+python-dotenv
+passlib
+PyJWT
+pymupdf
