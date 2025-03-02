@@ -1,5 +1,5 @@
 from bson import ObjectId
-from db import papers_collection
+from llm_research_assistant.db import papers_collection
 
 
 async def store_paper_metadata(filename, pdf_url, user_id):
