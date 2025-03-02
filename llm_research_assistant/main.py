@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import users, papers, chats, auth
+from llm_research_assistant.routes import users, papers, chats, auth
 
 app = FastAPI(title="LLM Research Assistant API", version="0.1.0")
 
