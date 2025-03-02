@@ -9,3 +9,4 @@ python-dotenv
 passlib
 PyJWT
 pymupdf
+boto3
