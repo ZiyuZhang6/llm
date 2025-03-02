@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Query
 from typing import List, Optional
 from bson import ObjectId
 
-from db import chats_collection
-from schemas.chats import ChatCreate, ChatUpdate, ChatResponse
+from llm_research_assistant.db import chats_collection
+from llm_research_assistant.schemas.chats import ChatCreate, ChatUpdate, ChatResponse
 
 router = APIRouter(prefix="/chats", tags=["chats"])
 
