@@ -1,8 +1,8 @@
-fastapi
+fastapi == 0.68.0
 uvicorn
 motor
 pymongo
-pydantic == 1.10.12
+pydantic == 1.8.0
 requests
 streamlit
 python-dotenv
