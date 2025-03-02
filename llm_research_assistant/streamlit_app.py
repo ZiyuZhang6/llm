@@ -2,14 +2,13 @@ import streamlit as st
 import requests
 import subprocess
 import time
-import os
 
 
-fastapi_process = subprocess.Popen(["uvicorn", "llm_research_assistant.main:app", "--host", "0.0.0.0", "--port", "8000"])
+fastapi_process = subprocess.Popen(["uvicorn", "llm_research_assistant.main:app", "--host", "0.0.0.0", "--port", "8001"])
 time.sleep(5)  
 
 
-API_BASE_URL = "http://localhost:8000"  # Adjust if needed
+API_BASE_URL = "http://localhost:8001"  # Adjust if needed
 
 
 def do_login(email, password):
