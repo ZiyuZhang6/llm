@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Query, UploadFile, Depends, File
 from typing import List, Optional
 from bson import ObjectId
+import hashlib
 import fitz
 from llm_research_assistant.services.s3_service import (
     upload_pdf_to_s3,
@@ -36,11 +37,18 @@ async def create_paper(
     # Validate PDF structure
     await validate_pdf(file)
 
+    # Calculate the file hash
+    file_hash = calculate_file_hash(file)
+
     # Upload file to S3
-    pdf_url = await upload_pdf_to_s3(file, current_user["_id"])
+    pdf_url = await upload_pdf_to_s3(
+        file, current_user["_id"], file.filename, file_hash
+    )
 
     # Store metadata in MongoDB
-    paper_id = await store_paper_metadata(file.filename, pdf_url, current_user["_id"])
+    paper_id = await store_paper_metadata(
+        file.filename, pdf_url, current_user["_id"], file_hash
+    )
 
     return PaperResponse(
         id=paper_id,
@@ -127,8 +135,8 @@ async def update_paper(paper_id: str, paper_in: PaperUpdate):
     )
 
 
-@router.delete("/{paper_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_paper(paper_id: str):
+@router.delete("/{paper_id}", status_code=status.HTTP_200_OK)
+async def delete_paper(paper_id: str, current_user: dict = Depends(get_current_user)):
     """
     Delete paper form s3 and mongodb by paper ID.
     """
@@ -137,19 +145,46 @@ async def delete_paper(paper_id: str):
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
 
+    # Check if the current user is the owner of the paper
+    if paper["owner_id"] != str(current_user["_id"]):
+        raise HTTPException(
+            status_code=403, detail="You are not authorized to delete this paper."
+        )
+
+    # Check how many users are associated
+    # with the file by counting documents with the same file_hash
+    associated_users_count = await papers_collection.count_documents(
+        {"file_hash": paper["file_hash"]}
+    )
+
+    # If the file is shared with other users, prevent deletion from S3
+    if associated_users_count > 1:
+        # Delete the user's metadata from MongoDB
+        result = await delete_paper_metadata(paper_id, current_user["_id"])
+
+        if not result:
+            raise HTTPException(
+                status_code=500, detail="Failed to delete paper metadata."
+            )
+
+        return {
+            "message": "Paper metadata deleted successfully,"
+            " but file remains in S3 due to other users."
+        }
+
     try:
         # Delete file from S3
         await delete_pdf_from_s3(paper["pdf_url"])
 
         # Delete metadata from MongoDB
-        deleted = await delete_paper_metadata(paper_id)
+        deleted = await delete_paper_metadata(paper_id, current_user["_id"])
 
         if not deleted:
             raise HTTPException(
                 status_code=500, detail="Failed to delete paper metadata from MongoDB."
             )
 
-        return None  # 204 No Content
+        return {"message": f"File with ID {paper_id} deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -184,3 +219,18 @@ async def validate_pdf(file: UploadFile):
         return pdf_data
     except Exception:
         raise HTTPException(status_code=400, detail="Corrupt or unreadable PDF.")
+
+
+# helper function
+def calculate_file_hash(file_data):
+    """Generate SHA256 hash for the file data."""
+    sha256 = hashlib.sha256()
+
+    # If it's a file-like object (like in local uploads), read it in chunks
+    if isinstance(file_data, bytes):
+        sha256.update(file_data)  # If file is already bytes (e.g., Gmail attachment)
+    else:
+        for chunk in file_data.file:  # If it's an UploadFile object, read in chunks
+            sha256.update(chunk)
+
+    return sha256.hexdigest()
