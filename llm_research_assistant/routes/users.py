@@ -2,7 +2,7 @@ import bson
 from fastapi import APIRouter, HTTPException, status, Query, Depends
 from typing import List
 from bson import ObjectId
-from db import users_collection
+from llm_research_assistant.db import users_collection
 from schemas.users import UserCreate, UserUpdate, UserResponse
 from security import hash_password
 from dependencies import get_current_user
