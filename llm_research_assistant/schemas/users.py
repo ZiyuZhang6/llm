@@ -19,6 +19,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: str
+    connected_email: Optional[str] = None  # Now returns email ingestion info
 
     class Config:
         orm_mode = True
