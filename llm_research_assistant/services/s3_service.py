@@ -1,6 +1,10 @@
 import boto3
 import os
 from dotenv import load_dotenv
+import asyncio
+from io import BytesIO
+from llm_research_assistant.db import papers_collection
+
 
 # Load AWS credentials
 load_dotenv()
@@ -16,13 +20,31 @@ s3_client = boto3.client(
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 
-async def upload_pdf_to_s3(file, user_id):
+async def upload_pdf_to_s3(file, user_id, filename, file_hash):
     """Uploads a PDF to S3 and returns the file URL."""
-    s3_file_key = "papers/{}/{}".format(user_id, file.filename)
 
+    # Check if the file hash already exists in MongoDB
+    existing_file = await papers_collection.find_one({"file_hash": file_hash})
+
+    if existing_file:
+        return existing_file["pdf_url"]  # Return the existing URL for this file
+
+    # If the file does not exist, upload it to S3
+    s3_file_key = (
+        f"papers/{file_hash}/{filename}"  # Use the file hash as part of the key
+    )
     try:
-        file.file.seek(0)  # Ensure the file is read from the start
-        s3_client.upload_fileobj(file.file, S3_BUCKET_NAME, s3_file_key)
+        if isinstance(file, bytes):
+            file_data = BytesIO(file)  # Convert bytes into a file-like object
+        else:
+            file_data = file.file  # This works for local file uploads (UploadFile)
+
+        # file.file.seek(0) #for upload
+        file_data.seek(0)
+
+        await asyncio.to_thread(
+            s3_client.upload_fileobj, file_data, S3_BUCKET_NAME, s3_file_key
+        )
         pdf_url = "https://{}.s3.amazonaws.com/{}".format(S3_BUCKET_NAME, s3_file_key)
         return pdf_url
     except Exception as e:
