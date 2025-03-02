@@ -5,7 +5,7 @@ import time
 import os
 
 
-fastapi_process = subprocess.Popen(["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"])
+fastapi_process = subprocess.Popen(["uvicorn", "llm_research_assistant.main:app", "--host", "0.0.0.0", "--port", "8000"])
 time.sleep(5)  
 
 
