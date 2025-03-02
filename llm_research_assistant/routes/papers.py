@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Query, UploadFile, Depends
 from typing import List, Optional
 from bson import ObjectId
 import fitz
-from services.s3_service import (
+from llm_research_assistant.services.s3_service import (
     upload_pdf_to_s3,
     get_pdf_url_from_s3,
     delete_pdf_from_s3,
