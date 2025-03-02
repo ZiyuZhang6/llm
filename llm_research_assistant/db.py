@@ -1,5 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from llm_research_assistant.config import settings
+from config import settings
 import asyncio
 
 client = AsyncIOMotorClient(settings.MONGODB_URI)
